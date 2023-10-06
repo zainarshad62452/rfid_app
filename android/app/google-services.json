@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1054724599720",
+    "project_id": "attendance-app-ab701",
+    "storage_bucket": "attendance-app-ab701.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1054724599720:android:4eb3ee696949574732f79d",
+        "android_client_info": {
+          "package_name": "com.example.rfid_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgBK4dHktF4c4crXoV5rYoQyRXVi0ik-w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
