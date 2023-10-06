@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> {
     );
     return Stack(
       children: [
-        !loading()?Scaffold(
+        Scaffold(
           backgroundColor: Colors.white,
           key: _scaffoldKey,
           appBar: AppBar(
@@ -311,8 +311,9 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-        ):LoadingWidget(),
-        LoadingWidget()
+        ),
+        !loading()?
+        SizedBox():LoadingWidget(),
       ],
     );
   }
