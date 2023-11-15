@@ -154,7 +154,7 @@ class _ParentHomePageState extends State<ParentHomePage> {
                               fontSize: 18),
                         ),
                       ),
-                      Container(
+                      Obx(() => Container(
                         height: 400,
                         padding: EdgeInsets.only(top: 14),
                         child: ListView.builder(
@@ -166,7 +166,9 @@ class _ParentHomePageState extends State<ParentHomePage> {
                             var students = checksCntr.allItems?.value[index];
                             DateTime currentDate = DateTime.now();
                             DateTime checkInDate = students!.checkInTime!;
-
+                            print(checkInDate.year == currentDate.year &&
+                                checkInDate.month == currentDate.month &&
+                                checkInDate.day == currentDate.day);
                             // Check if the check-in date is today
                             if (checkInDate.year == currentDate.year &&
                                 checkInDate.month == currentDate.month &&
@@ -198,7 +200,7 @@ class _ParentHomePageState extends State<ParentHomePage> {
                             return SizedBox.shrink();
                           },
                         ),
-                      ),
+                      )),
                       SizedBox(
                         height: 30,
                       ),
