@@ -27,6 +27,7 @@ class UserServices {
       rollNo: rollNo,
       parentName: parentName,
       className: className,
+      check: false
     );
 
     try {
@@ -35,7 +36,7 @@ class UserServices {
       Reception().userReception();
     } catch (e) {
       loading(false);
-      alertSnackbar("Can't register user");
+      alertSnackbar("${e.toString()}");
     }
   }
 

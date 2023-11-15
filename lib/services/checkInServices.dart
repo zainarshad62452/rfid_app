@@ -31,7 +31,7 @@ class CheckInServices {
       await userRef.set(x.toJson()).then((value){
         _databaseReference.child("students").child(uid).update({
           "check": checkInOrOut
-        });
+        }).then((value) => snackbar("Success", "Attendance is Updated Successfully"));
       });
       loading(false);
     } catch (e) {

@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rfid_app/Services/Authentication.dart';
+import 'package:rfid_app/controllers/userController.dart';
 import 'package:rfid_app/screens/admin/allCheckIn&Out.dart';
 import 'package:rfid_app/screens/admin/allStudents.dart';
 import 'package:rfid_app/screens/admin/rfidReaderConnector.dart';
@@ -45,6 +46,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _getUser();
     studentName =  TextEditingController();
+    Get.put(UserController());
   }
 
   @override

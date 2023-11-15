@@ -22,7 +22,7 @@ class LoadingWidget extends StatelessWidget {
             child: SizedBox(
               // width: 32,
               // height: 32,
-              child:  Lottie.asset('images/loading.json'),
+              child:  CircularProgressIndicator(),
             ),
           ),
         ));

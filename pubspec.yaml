@@ -46,6 +46,7 @@ dependencies:
   firebase_auth: ^4.6.1
   firebase_database: ^10.2.7
   rfid_c72_plugin: ^0.0.1
+#  uhf_c72_plugin_2: ^0.2.9
   intl: ^0.18.1
   flutter_tabler_icons: ^1.1.2
   cloud_firestore: ^4.7.1
