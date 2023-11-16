@@ -7,10 +7,8 @@ import '../Controllers/loading.dart';
 import '../screens/widgets/snackbar.dart';
 import 'Reception.dart';
 import 'userServices.dart';
-
 class Authentication {
   FirebaseAuth auth = FirebaseAuth.instance;
-
   void createAccount({
     required String name,
     required String email,

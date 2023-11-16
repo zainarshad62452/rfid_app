@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ui';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/painting.dart';
 import 'package:get/get.dart';
@@ -10,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rfid_app/Controllers/loading.dart';
 import 'package:rfid_app/Services/Authentication.dart';
 import 'package:rfid_app/controllers/userController.dart';
+import 'package:rfid_app/models/checkInModel.dart';
 import 'package:rfid_app/screens/widgets/loading.dart';
 import 'package:rfid_app/controllers/checksController.dart';
 
@@ -22,6 +24,7 @@ class _ParentHomePageState extends State<ParentHomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController studentName = TextEditingController();
   FirebaseAuth _auth = FirebaseAuth.instance;
+  var current = Get.put(UserController());
   User? user;
 
   Future<void> _getUser() async {
@@ -43,6 +46,8 @@ class _ParentHomePageState extends State<ParentHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final DatabaseReference _databaseReference =
+    FirebaseDatabase.instance.reference();
     String? _message;
     DateTime now = DateTime.now();
     String _currentHour = DateFormat('kk').format(now);
@@ -104,81 +109,77 @@ class _ParentHomePageState extends State<ParentHomePage> {
             ),
           ),
           body: SafeArea(
-            child: NotificationListener<OverscrollIndicatorNotification>(
-              onNotification: (OverscrollIndicatorNotification overscroll) {
-                overscroll.disallowGlow();
-                return true;
-              },
-              child: ListView(
-                physics: ClampingScrollPhysics(),
-                shrinkWrap: true,
-                children: <Widget>[
-                  Column(
-                    children: [
-                      SizedBox(
-                        height: 30,
-                      ),
-                      Container(
-                        alignment: Alignment.centerLeft,
-                        padding: EdgeInsets.only(left: 20, bottom: 10),
-                        child: Text(
-                          "Welcome Parents!",
-                          // "Hello " + user!.displayName!,
-                          style: GoogleFonts.lato(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        alignment: Alignment.centerLeft,
-                        padding: EdgeInsets.only(left: 20, bottom: 25),
-                        child: Text(
-                          "Let's Monitor Students",
-                          style: GoogleFonts.lato(
-                            fontSize: 35,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: EdgeInsets.only(left: 20),
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          "All CheckIn & Out",
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.lato(
-                            // color: Colors.blue[800],
-                              color: Colors.tealAccent.shade700,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18),
-                        ),
-                      ),
-                      Obx(() => Container(
-                        height: 400,
-                        padding: EdgeInsets.only(top: 14),
-                        child: ListView.builder(
-                          physics: ClampingScrollPhysics(),
-                          scrollDirection: Axis.vertical,
-                          padding: EdgeInsets.symmetric(horizontal: 20.0),
-                          itemCount: checksCntr.allItems?.value.length,
-                          itemBuilder: (context, index) {
-                            var students = checksCntr.allItems?.value[index];
-                            DateTime currentDate = DateTime.now();
-                            DateTime checkInDate = students!.checkInTime!;
-                            print(checkInDate.year == currentDate.year &&
-                                checkInDate.month == currentDate.month &&
-                                checkInDate.day == currentDate.day);
-                            // Check if the check-in date is today
-                            if (checkInDate.year == currentDate.year &&
-                                checkInDate.month == currentDate.month &&
-                                checkInDate.day == currentDate.day) {
-                              // Format date to day, month, year, hour, minute, second, AM/PM
-                              String formattedDate = DateFormat('dd MMMM yyyy hh:mm:ss a').format(checkInDate);
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 30,
+                ),
+                Container(
+                  alignment: Alignment.centerLeft,
+                  padding: EdgeInsets.only(left: 20, bottom: 10),
+                  child: Text(
+                    "Welcome Parents!",
+                    // "Hello " + user!.displayName!,
+                    style: GoogleFonts.lato(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                Container(
+                  alignment: Alignment.centerLeft,
+                  padding: EdgeInsets.only(left: 20, bottom: 25),
+                  child: Text(
+                    "Let's Monitor Students",
+                    style: GoogleFonts.lato(
+                      fontSize: 35,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.only(left: 20),
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "All CheckIn & Out",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.lato(
+                      // color: Colors.blue[800],
+                        color: Colors.tealAccent.shade700,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18),
+                  ),
+                ),
+                StreamBuilder(
+                  stream: _databaseReference.child("checks").onValue,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data?.snapshot.value == null) {
+                      return Center(child: Text('No data available.'));
+                    }
+                    final data = snapshot.data?.snapshot.value as Map<dynamic, dynamic>;
 
-                              if(students.rfidNumber == userCntr.user!.value.rfidNumber) {
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                    List<MapEntry<dynamic, dynamic>> sortedData = data.entries.toList()
+                      ..sort((a, b) {
+                        var dateA = DateTime.parse(a.value['checkInTime']);
+                        var dateB = DateTime.parse(b.value['checkInTime']);
+                        return dateB.compareTo(dateA);
+                      });
+                    return SizedBox(
+                      height: 500,
+                      child: ListView.builder(
+                          itemCount: sortedData.length,
+                          itemBuilder: (ctx,entry){
+                            final students = CheckIn.fromJson(sortedData[entry].value);
+                            String formattedDate = DateFormat('dd MMMM yyyy hh:mm:ss a').format(students.checkInTime!);
+                           print(userCntr.user?.value.rfidNumber);
+                            if(students.rfidNumber == userCntr.user?.value.rfidNumber)
+                            {
+                              return  Padding(
+                                  padding: const EdgeInsets.all(10.0),
                                   child: Container(
                                     decoration: BoxDecoration(
                                       border: Border.all(color: Colors.black),
@@ -186,28 +187,30 @@ class _ParentHomePageState extends State<ParentHomePage> {
                                     ),
                                     child: ListTile(
                                       title: Text(students.studentName!),
-                                      subtitle: Text(formattedDate),  // Use the formatted date
+                                      subtitle: Text(formattedDate),
                                       trailing: students.checkInOrOut!
-                                          ? Text("Check In", style: TextStyle(color: Colors.green))
-                                          : Text("Check Out", style: TextStyle(color: Colors.red)),
+                                          ? const Text(
+                                        "Check In",
+                                        style: TextStyle(color: Colors.green),
+                                      )
+                                          : const Text(
+                                        "Check Out",
+                                        style: TextStyle(color: Colors.red),
+                                      ),
                                     ),
                                   ),
                                 );
-                              }
+                            }else{
+                              return SizedBox();
                             }
-
-                            // If it's not today's data or not the current user, return an empty SizedBox
-                            return SizedBox.shrink();
-                          },
-                        ),
-                      )),
-                      SizedBox(
-                        height: 30,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                      }),
+                    );
+                  },
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+              ],
             ),
           ),
         ):LoadingWidget(),

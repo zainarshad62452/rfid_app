@@ -4,6 +4,7 @@ import 'package:rfid_app/controllers/checksController.dart';
 import 'package:rfid_app/screens/admin/homePage.dart';
 import 'package:rfid_app/screens/auth/signIn.dart';
 import 'package:rfid_app/screens/user/homePage.dart';
+import 'package:rfid_app/services/Authentication.dart';
 import '../controllers/userController.dart';
 
 class Reception {
